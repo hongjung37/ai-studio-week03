@@ -28,7 +28,7 @@ df["단가"] = ( pd.to_numeric( df["단가"].astype(str).str.replace(",", "", re
 df["총액"] = df["단가"] * df["수량"] # 총액 열 추가
 
 #추가 후 info 확인 (정상적으로 단가가 정제 및 월 ,총액 열 생성 확인)
-print(df.info())
+#print(df.info())
 """
 <class 'pandas.DataFrame'>
 RangeIndex: 500 entries, 0 to 499
@@ -45,3 +45,23 @@ Data columns (total 7 columns):
 dtypes: Int64(2), int32(1), int64(1), str(3)
 memory usage: 26.5 KB
 None"""
+
+summary_monthly = (
+    df.groupby(["월", "카테고리"])["총액"]
+    .agg(
+        총매출="sum",
+        평균매출="mean",
+        거래건수="count"
+    )
+    .reset_index() 
+    .round({"평균매출": 1}) #평균매출의 소숫점을 1자리로 제한
+)
+
+
+# 2. 카테고리별 합계 및 내림차순 정렬 (시트: 카테고리별합계)
+summary_category = (
+    df.groupby("카테고리")["총액"]
+    .sum()
+    .reset_index()
+    .sort_values(by="총액", ascending=False) #내림차순 정렬
+)
