@@ -57,6 +57,7 @@ summary_monthly = (
     .round({"평균매출": 1}) #평균매출의 소숫점을 1자리로 제한
 )
 
+assert df["총액"].sum() == summary_monthly["총매출"].sum(), "원본 매출액 총합과 집계표 총매출 합이 일치하지 않습니다."
 
 # 2. 카테고리별 합계 및 내림차순 정렬 (시트: 카테고리별합계)
 summary_category = (
@@ -65,3 +66,18 @@ summary_category = (
     .reset_index()
     .sort_values(by="총액", ascending=False) #내림차순 정렬
 )
+
+with pd.ExcelWriter("Monthly_Report.xlsx", engine="openpyxl") as writer:
+    # 1. '월별카테고리요약' 시트 저장
+    summary_monthly.to_excel(
+        writer, 
+        sheet_name="월별카테고리요약", 
+        index=False
+    )
+    
+    # 2. '카테고리별합계' 시트 저장
+    summary_category.to_excel(
+        writer, 
+        sheet_name="카테고리별합계", 
+        index=False
+    )
